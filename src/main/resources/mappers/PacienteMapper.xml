@@ -5,13 +5,6 @@
   
 <mapper namespace="edu.eci.pdsw.samples.persistence.mybatisimpl.mappers.PacienteMapper">
 
-    <resultMap type='Paciente' id='PacienteResult'>
-        <id property='id' column='id'/>        
-        <id property='tipo_id' column='tipo_id' typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property='fechaNacimiento' column='fecha_nacimiento'/>
-        <result property='nombre' column='nombre'/>
-    </resultMap>
-
     <select id="getPacientes" resultMap="PacienteResult">
         SELECT
             p.id,
@@ -21,4 +14,60 @@
         FROM
             PACIENTES as p
     </select>
+
+    <resultMap type='Paciente' id='PacienteResult'>
+        <id property='id' column='id'/>        
+        <id property='tipo_id' column='tipo_id' typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property='fechaNacimiento' column='fecha_nacimiento'/>
+        <result property='nombre' column='nombre'/>
+    </resultMap>
+
+    <select id="getPacientById" resultMap="ResultPacientById">
+        SELECT
+            p.id                    AS paciente_id,
+            p.tipo_id               AS paciente_tipo_id,
+            p.fecha_nacimiento      AS paciente_fecha_nacimiento,
+            p.nombre                AS paciente_nombre,
+
+            c.idCONSULTAS           AS consulta_id,
+            c.fecha_y_hora          AS consulta_fecha_y_hora,
+            c.resumen               AS consulta_resumen
+        FROM
+            PACIENTES AS p LEFT JOIN CONSULTAS AS c ON p.id = c.PACIENTES_id
+        WHERE
+            p.id = #{id} AND p.tipo_id = #{idType}
+    </select>
+
+    <resultMap type='Paciente' id='ResultPacientById'>
+        <id property='id' column='paciente_id'/>
+        <id property='tipo_id' column='paciente_tipo_id' typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property='fechaNacimiento' column='paciente_fecha_nacimiento'/>
+        <result property='nombre' column='paciente_nombre'/>
+        <collection property="consultas" ofType="Consulta" resultMap="ResultConsult"/>
+    </resultMap>
+
+    <resultMap type='Consulta' id='ResultConsult'>
+        <id property="id" column="consulta_id"/>
+        <result property='fechayHora' column='consulta_fecha_y_hora'/>
+        <result property='resumen' column='consulta_resumen'/>
+    </resultMap>
+
+    <select id="menoresContagiosos" resultMap="ResultPacientById">
+        SELECT
+            p.id                    AS paciente_id,
+            p.tipo_id               AS paciente_tipo_id,
+            p.fecha_nacimiento      AS paciente_fecha_nacimiento,
+            p.nombre                AS paciente_nombre,
+
+            c.idCONSULTAS           AS consulta_id,
+            c.fecha_y_hora          AS consulta_fecha_y_hora,
+            c.resumen               AS consulta_resumen
+        FROM
+            PACIENTES AS p LEFT JOIN CONSULTAS AS c ON p.id = c.PACIENTES_id
+        WHERE
+            (C.resumen LIKE "%varicela%" OR C.resumen LIKE "%varicela%")
+            AND
+            ((TIMESTAMPDIFF(YEAR, p.fecha_nacimiento, CURDATE()) &lt; 18))
+    </select>
+
 </mapper>

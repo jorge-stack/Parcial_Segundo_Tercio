@@ -18,6 +18,8 @@ package edu.eci.pdsw.samples.tests;
 
 import edu.eci.pdsw.samples.entities.Paciente;
 import edu.eci.pdsw.samples.entities.Consulta;
+import edu.eci.pdsw.samples.entities.TipoIdentificacion;
+import edu.eci.pdsw.samples.persistence.PersistenceException;
 import edu.eci.pdsw.samples.services.ExcepcionServiciosSuscripciones;
 import edu.eci.pdsw.samples.services.ServiciosPacientesFactory;
 import java.sql.Connection;
@@ -64,14 +66,18 @@ public class ServicesJUnitTest {
     }
     
     @Test
-    public void pruebaCeroTest() throws SQLException, ExcepcionServiciosSuscripciones {
+    public void pruebaCeroTest() throws SQLException, ExcepcionServiciosSuscripciones, PersistenceException {
         //Insertar datos en la base de datos de pruebas, de acuerdo con la clase
         //de equivalencia correspondiente
         Connection conn=getConnection();
         Statement stmt=conn.createStatement();
 
-        stmt.execute("INSERT INTO `PACIENTES` (`id`, `tipo_id`, `nombre`, `fecha_nacimiento`) VALUES (9876,'TI','Carmenzo','1995-07-10')");
-        stmt.execute("INSERT INTO `CONSULTAS` (`idCONSULTAS`, `fecha_y_hora`, `resumen`, `PACIENTES_id`, `PACIENTES_tipo_id`) VALUES (1262218,'2001-01-01 00:00:00','Gracias',9876,'TI')");
+        stmt.execute("INSERT INTO `PACIENTES` " +
+                "(`id`, `tipo_id`, `nombre`, `fecha_nacimiento`) " +
+                "VALUES (9876,'TI','Carmenzo','1995-07-10')");
+        stmt.execute("INSERT INTO `CONSULTAS` " +
+                "(`idCONSULTAS`, `fecha_y_hora`, `resumen`, `PACIENTES_id`, `PACIENTES_tipo_id`) " +
+                "VALUES (1262218,'2001-01-01 00:00:00','Gracias',9876,'TI')");
 
         conn.commit();
         conn.close();
@@ -79,14 +85,12 @@ public class ServicesJUnitTest {
         //Realizar la operacion de la logica y la prueba
         
         
-        List<Paciente> pacientes = ServiciosPacientesFactory.getInstance().getTestingForumServices().consultarPacientes();
+        Paciente pacientes = ServiciosPacientesFactory.getInstance().getTestingForumServices().
+                getPacientById(9876, TipoIdentificacion.TI);
 
-        
-        for (Paciente paciente : pacientes){
-            System.out.println(paciente);
-        }
+        Assert.assertEquals("Carmenzo", pacientes.getNombre());
         //assert ...
-        Assert.fail("Pruebas no implementadas aun...");
+        // Assert.fail("Pruebas no implementadas aun...");
         
     }    
     

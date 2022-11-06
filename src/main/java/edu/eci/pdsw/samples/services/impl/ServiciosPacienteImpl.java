@@ -33,13 +33,13 @@ public class ServiciosPacienteImpl implements ServiciosPaciente {
     }
 
     @Override
-    public Paciente consultarPacientesPorId(int id, TipoIdentificacion tipoIdentificacion) throws ExcepcionServiciosSuscripciones {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Paciente getPacientById(int id, TipoIdentificacion tipoIdentificacion) throws ExcepcionServiciosSuscripciones, PersistenceException {
+            return daoPaciente.load(id, tipoIdentificacion);
     }
 
     @Override
-    public List<Paciente> consultarMenoresConEnfermedadContagiosa() throws ExcepcionServiciosSuscripciones {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Paciente> getMenoresConEnfermedadContagiosa() throws ExcepcionServiciosSuscripciones, PersistenceException {
+        return daoPaciente.loadMenoresContagiosos();
     }
 
 

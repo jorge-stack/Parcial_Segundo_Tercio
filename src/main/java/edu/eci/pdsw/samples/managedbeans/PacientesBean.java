@@ -16,9 +16,11 @@
  */
 package edu.eci.pdsw.samples.managedbeans;
 
+import com.google.inject.Inject;
 import edu.eci.pdsw.samples.entities.Paciente;
 import edu.eci.pdsw.samples.entities.TipoIdentificacion;
 import edu.eci.pdsw.samples.services.ExcepcionServiciosSuscripciones;
+import edu.eci.pdsw.samples.services.ServiciosPaciente;
 import edu.eci.pdsw.samples.services.ServiciosPacientesFactory;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -30,9 +32,29 @@ import javax.faces.bean.SessionScoped;
  */
 @ManagedBean(name = "mb")
 @SessionScoped
-public class PacientesBean {
+public class PacientesBean extends BasePageBean{
 
     TipoIdentificacion tipoIdentificacion = TipoIdentificacion.CC;
+    Paciente paciente;
+    @Inject
+    ServiciosPaciente sp;
+    List<Paciente> menoresContagiosos;
+
+    public void getPacientById(int id) {
+        try {
+            paciente = sp.getPacientById(id, tipoIdentificacion);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getMenoresConEnfermedadContagiosa() {
+        try {
+            menoresContagiosos = sp.getMenoresConEnfermedadContagiosa();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void setTipoIdentificacion(TipoIdentificacion tipoIdentificacion) {
         this.tipoIdentificacion = tipoIdentificacion;
@@ -55,5 +77,12 @@ public class PacientesBean {
     public TipoIdentificacion[] getTiposIdentificacion() {
         return TipoIdentificacion.values();
     }
-    
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
+    }
 }
